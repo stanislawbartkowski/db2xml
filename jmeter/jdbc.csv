@@ -1,0 +1,1 @@
+jdbc:db2://thinkde:50000/testdb,com.ibm.db2.jcc.DB2Driver,db2inst1,secret123,select 1 from sysibm.sysdummy1
