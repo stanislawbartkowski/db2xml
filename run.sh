@@ -2,11 +2,16 @@ source env.rc
 
 source common/commonproc.sh
 source common/db2commonproc.sh
+source common/oraclecommonproc.sh
 
 touchlogfile
 usetemp
 
 XMLTABLE=IDXML
+
+# -------------------------------------------
+# DB2 
+# -------------------------------------------
 
 testconn() {
     db2connect
@@ -67,9 +72,52 @@ load() {
     db2terminate
 }
 
-#testconn
-#droptable
-#createtable
-#createpartitionedtable
-#generate
-load
+# -------------------------------------------------------
+# Oracle
+# -------------------------------------------------------
+
+oracledroptable() {
+    oraclecommand "DROP TABLE $XMLTABLE"
+}
+
+oraclecreatetable() {
+    local -r TMPF=`crtemp`
+
+cat << EOF  >$TMPF
+CREATE TABLE $XMLTABLE (ID INT PRIMARY KEY NOT NULL, BOOKS XMLTYPE);
+EOF
+    oraclescript $TMPF
+
+}
+
+oraclegenerate() {
+    local TEMPXML=$(cat resource/books.xml | tr -d "\n")
+    rm -f $CSVFILE
+    for id in $(seq 1 $SIZE); do
+      echo $id $COLDEL $TEMPXML >>$CSVFILE
+    done
+}
+
+# ---------------------------------------
+
+db2() {
+    #testconn
+    droptable
+    #createtable
+    createpartitionedtable
+    #generate
+    load
+}
+
+#oracleloadfile $XMLTABLE inxml.csv
+
+oracle() {
+    #oracletestconnection
+    #oracledroptable
+    #oraclecreatetable
+    #oraclegenerate
+    oracleloadfile $XMLTABLE $CSVFILE
+    log "OK"      
+}
+
+oracle

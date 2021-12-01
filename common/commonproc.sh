@@ -1,3 +1,10 @@
+# ----------------------------------
+# my bash shell common utilitities
+# version: 1.00
+# 2021/11/11
+# 2021/12/01 - COLDEL added, logfile
+# ----------------------------------
+
 #set -x
 #w
 
@@ -6,6 +13,7 @@
 # ------------------
 
 REPDEL='|'
+COLDEL=${COLDEL:-|}
 
 required_var() {
   local -r VARIABLE=$1
@@ -21,6 +29,11 @@ required_listofvars() {
 # -------------------------
 # logging
 # -------------------------
+
+logfile() {
+  [ -n "$LOGFILE" ] && cat $1 >>$LOGFILE
+  cat $1
+}
 
 log() {
   [ -n "$LOGFILE" ] && echo $1 >>$LOGFILE
@@ -51,6 +64,17 @@ execute_withlog() {
         log "$CMD"
         logfail "Job failed"
     fi
+}
+
+# -------------------------
+# misc
+# -------------------------
+
+trim() {
+    local var="$1"
+    var="${var#"${var%%[![:space:]]*}"}"
+    var="${var%"${var##*[![:space:]]}"}"   
+    printf '%s' "$var"
 }
 
 # -------------------------

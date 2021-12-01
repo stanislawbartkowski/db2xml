@@ -29,7 +29,7 @@
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
           <stringProp name="dataSource">DB2</stringProp>
           <stringProp name="queryType">Prepared Select Statement</stringProp>
-          <stringProp name="query">select ID, trim(xmlserialize(books as varchar(10000))) from testxml.idxml where ID=?</stringProp>
+          <stringProp name="query">select ID, substr(trim(xmlserialize(books as varchar(10000))),1,10) from testxml.idxml where ID=?</stringProp>
           <stringProp name="queryArguments">${__Random(0,${IDRANGE})}</stringProp>
           <stringProp name="queryArgumentsTypes">integer</stringProp>
           <stringProp name="variableNames"></stringProp>
@@ -81,13 +81,13 @@
           <collectionProp name="Arguments.arguments">
             <elementProp name="NUMOFTHREADS" elementType="Argument">
               <stringProp name="Argument.name">NUMOFTHREADS</stringProp>
-              <stringProp name="Argument.value">${__P(NUMOFTHREADS,10)}</stringProp>
+              <stringProp name="Argument.value">${__P(NUMOFTHREADS,1)}</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
               <stringProp name="Argument.desc">Number of threads</stringProp>
             </elementProp>
             <elementProp name="LOOPCOUNTER" elementType="Argument">
               <stringProp name="Argument.name">LOOPCOUNTER</stringProp>
-              <stringProp name="Argument.value">${__P(LOOPCOUNTER,1000)}</stringProp>
+              <stringProp name="Argument.value">${__P(LOOPCOUNTER,10)}</stringProp>
               <stringProp name="Argument.desc">Loop counter</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
