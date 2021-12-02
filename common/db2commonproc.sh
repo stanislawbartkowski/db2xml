@@ -2,7 +2,11 @@
 # my db2 command shell functions
 # version 1.00
 # 2021/11/11
+# 2021/12/02 - added set -x w at the beginning
 # -----------------------------------
+
+#set -x
+#w
 
 db2clirun() {
     required_var DBPASSWORD
@@ -109,7 +113,7 @@ db2runscript() {
   local -r f=$1
   db2 -x -tsf $f 
   [ $? -ne 0 ] && logfail "Failed running $f"
-}
+} 
 
 db2exportcommand() {
   required_var DELIM
@@ -125,6 +129,6 @@ db2loadblobs() {
   local -r IMPBLOBDIR=$2
   local -r IMPTABLE=$3
   log "Load $IMPTABLE table from server $IMPFILE using blobs in $IMPBLOBDIR"
-  db2 "LOAD FROM $IMPFILE OF DEL LOBS FROM $IMPBLOBDIR REPLACE INTO $IMPTABLE"
+  db2 "LOAD FROM $IMPFILE OF DEL LOBS FROM $IMPBLOBDIR MODIFIED BY COLDEL$COLDEL REPLACE INTO $IMPTABLE"
   [ $? -ne 0 ] && logfail "Load failed"
 }

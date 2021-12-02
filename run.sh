@@ -13,7 +13,7 @@ XMLTABLE=IDXML
 # DB2 
 # -------------------------------------------
 
-testconn() {
+db2testconn() {
     db2connect
     db2terminate
 }
@@ -100,11 +100,11 @@ oraclegenerate() {
 
 # ---------------------------------------
 
-db2() {
-    #testconn
-    droptable
+rundb2() {
+    #db2testconn
+    #droptable
     #createtable
-    createpartitionedtable
+    #createpartitionedtable
     #generate
     load
 }
@@ -120,4 +120,5 @@ oracle() {
     log "OK"      
 }
 
-oracle
+#oracle
+rundb2
