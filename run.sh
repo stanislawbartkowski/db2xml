@@ -93,6 +93,7 @@ EOF
 oraclegenerate() {
     local TEMPXML=$(cat resource/books.xml | tr -d "\n")
     rm -f $CSVFILE
+    log "Generate $CSVFILE  $SIZE rows"
     for id in $(seq 1 $SIZE); do
       echo $id $COLDEL $TEMPXML >>$CSVFILE
     done
@@ -120,5 +121,5 @@ oracle() {
     log "OK"      
 }
 
-#oracle
-rundb2
+oracle
+#rundb2
