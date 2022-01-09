@@ -8,6 +8,7 @@ touchlogfile
 usetemp
 
 XMLTABLE=IDXML
+TEMPVARCHAR=IDTEMP
 
 # -------------------------------------------
 # DB2 
@@ -29,6 +30,7 @@ createtable() {
     local -r TMPF=`crtemp`
 
 cat << EOF  >$TMPF
+DROP TABLE IF EXISTS $XMLTABLE;
 CREATE TABLE IF NOT EXISTS $XMLTABLE (ID INT PRIMARY KEY NOT NULL, BOOKS XML $INLINE) ORGANIZE BY ROW;
 EOF
     db2runscript $TMPF
@@ -45,6 +47,7 @@ createpartitionedtable() {
     local -r TMPF=`crtemp`
 
 cat << EOF  >$TMPF
+DROP TABLE IF EXISTS $XMLTABLE;
 CREATE TABLE IF NOT EXISTS $XMLTABLE (ID INT PRIMARY KEY NOT NULL, BOOKS XML $INLINE) ORGANIZE BY ROW 
   PARTITION BY RANGE (ID) (STARTING FROM (1)  INCLUSIVE ENDING AT ($SIZE) EVERY ($PARTITIONEVERY));
 EOF
@@ -60,7 +63,7 @@ generate() {
     log "Generuj $SIZE lines in file $CSVFILE"
     rm -f $CSVFILE
     for id in $(seq 1 $SIZE); do
-      echo $id,$XMLFILE >>$CSVFILE
+      echo $id$COLDEL$XMLFILE >>$CSVFILE
     done
     log "$CSVFILE Done"
 
@@ -70,6 +73,22 @@ load() {
     db2connect
     db2loadblobs $LOADDIR/$CSVFILE $LOADXMLDIR $XMLTABLE
     db2terminate
+}
+
+db2copyvar() {
+    db2connect
+    local -r TMPF=`crtemp`    
+    log "Copying XML table $XMLTABLE to $TEMPVARCHAR"
+cat << EOF  >$TMPF
+   DROP TABLE IF EXISTS $TEMPVARCHAR;
+   CREATE TABLE $TEMPVARCHAR AS (SELECT ID, trim(xmlserialize(books as varchar(10000))) AS books from $XMLTABLE) WITH DATA NOT LOGGED INITIALLY;
+   DROP TABLE $XMLTABLE;
+   RENAME TABLE $TEMPVARCHAR TO $XMLTABLE;
+EOF
+    db2runscript $TMPF
+
+    db2terminate
+
 }
 
 # -------------------------------------------------------
@@ -103,11 +122,14 @@ oraclegenerate() {
 
 rundb2() {
     #db2testconn
-    #droptable
-    #createtable
+    droptable
+    createtable
     #createpartitionedtable
     #generate
     load
+    db2copyvar
+    log "OK"      
+
 }
 
 #oracleloadfile $XMLTABLE inxml.csv
@@ -121,5 +143,5 @@ oracle() {
     log "OK"      
 }
 
-oracle
-#rundb2
+#oracle
+rundb2

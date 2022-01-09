@@ -29,7 +29,7 @@
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
           <stringProp name="dataSource">DB2</stringProp>
           <stringProp name="queryType">Prepared Select Statement</stringProp>
-          <stringProp name="query">select ID, substr(trim(xmlserialize(books as varchar(10000))),1,10) from testxml.idxml where ID=?</stringProp>
+          <stringProp name="query">select ID, substr(trim(books),1,10) from testxml.idxml where ID=?</stringProp>
           <stringProp name="queryArguments">${__Random(0,${IDRANGE})}</stringProp>
           <stringProp name="queryArgumentsTypes">integer</stringProp>
           <stringProp name="variableNames"></stringProp>

@@ -3,6 +3,9 @@
 # version 1.00
 # 2021/11/11
 # 2021/12/02 - added set -x w at the beginning
+# 2021/12/12 - change in loadserver
+# 2021/12/18 - db2clirun, timeout detection
+# 2021/12/16 - db2clirun, load messages
 # -----------------------------------
 
 #set -x
@@ -17,9 +20,12 @@ db2clirun() {
     local -r OTEMP=`crtemp`
     [ -n "$SCHEMA" ] && echo "SET CURRENT SCHEMA $SCHEMA ;" >$ITEMP
     cat $1 >>$ITEMP
-    db2cli execsql -statementdelimiter ";" -connstring "$CONNECTION" -inputsql $ITEMP -outfile $OTEMP
+    $QUERYTIMEOUT db2cli execsql -statementdelimiter ";" -connstring "$CONNECTION" -inputsql $ITEMP -outfile $OTEMP
+    [ $? -eq 124  ] && return 124
+    # timeout
     local RES=0
     if grep "ErrorMsg" $OTEMP; then
+      logfile $OTEMP
       log "Error found while executing the query, check logs"
       RES=8
     fi
@@ -39,10 +45,11 @@ db2loadfileserver() {
   local -r TABLENAME=$1
   local -r INLOADFILE=$2
   local -r TMPS=`crtemp`
-  local -r SFILE=`serverfile $INLOADFILE`
+  local -t MESSFILE=/tmp/$TABLENAME.txt
+#  local -r SFILE=`serverfile $INLOADFILE`
 
 cat << EOF > $TMPS
-    CALL SYSPROC.ADMIN_CMD('load from $SFILE  of del modified by coldel| replace into $TABLENAME');
+    CALL SYSPROC.ADMIN_CMD('load from $INLOADFILE  of del modified by coldel$COLDEL MESSAGES ON SERVER replace into $TABLENAME NONRECOVERABLE');
 EOF
 
   db2clirun $TMPS
@@ -82,7 +89,7 @@ db2loadfiles3() {
   log "Loading from $S3FILE S3/AWS file"
 
 cat << EOF > $TMPS
-  CALL SYSPROC.ADMIN_CMD('LOAD FROM S3::$ENDPOINT::$AWSKEY::$AWSSECRETKEY::$BUCKET::$S3FILE OF DEL modified by coldel| REPLACE INTO $TABLENAME NONRECOVERABLE');
+  CALL SYSPROC.ADMIN_CMD('LOAD FROM S3::$ENDPOINT::$AWSKEY::$AWSSECRETKEY::$BUCKET::$S3FILE OF DEL modified by coldel$COLDEL REPLACE INTO $TABLENAME NONRECOVERABLE');
 EOF
 
   db2clirun $TMPS
@@ -111,9 +118,9 @@ db2terminate() {
 
 db2runscript() {
   local -r f=$1
-  db2 -x -tsf $f 
+  db2 -x -tsf $f
   [ $? -ne 0 ] && logfail "Failed running $f"
-} 
+}
 
 db2exportcommand() {
   required_var DELIM
