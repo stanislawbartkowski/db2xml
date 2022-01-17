@@ -19,4 +19,6 @@ There are different options of column type used to keep XML data.<br>
 * (DB2) Use INLINE option
 * VARCHAR(32000)
 
+IN LINE or NOT IN LINE dilemma. 
+
 
