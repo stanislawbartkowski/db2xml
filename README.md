@@ -19,6 +19,7 @@ There are different options of column type used to keep XML data.<br>
 * (DB2) Use INLINE option
 * VARCHAR(32000)
 
-IN LINE or NOT IN LINE dilemma. 
+IN LINE or not IN LINE dilemma.<br>
+* BLOB, CLOB column stores XML data in a separate container and this data is not cached. So every 
 
 
