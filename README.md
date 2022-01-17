@@ -1,1 +1,10 @@
 # db2xml
+
+A simple tool to test performance on a typical table in Temenos banking software.
+
+https://stackoverflow.com/questions/51869740/temenos-t24-database-structure
+
+DB2 specific: https://blog.4loeser.net/2013/06/some-typical-db2-registry-settings-for.html
+
+
+
