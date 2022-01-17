@@ -11,6 +11,12 @@ A typical table schema is as follows :
 > CREATE TABLE XMLID (RECID VARCHAR(100) PRIMARY KEY NO NULL, XMLRECORD XMLTYPE)
 
 In Temenos software, relational database is simply a container for xml files. Typical database can contain up to 50000 (fifty thousand) tables.
-
+<br>
+There are different options of column type used to keep XML data.<br>
+* XMLTYPE (Oracle), XML (DB2)
+* CLOB
+* BLOB
+* (DB2) Use INLINE option
+* VARCHAR(32000)
 
 
